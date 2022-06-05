@@ -1,21 +1,17 @@
-﻿using System;
+﻿using CsvHelper;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using CsvHelper;
-using CsvHelper.Configuration;
-using LINQ1;
 
 // ReSharper disable UseFormatSpecifierInInterpolation
 
-namespace FirstProject
+namespace LINQ
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             string csvPath = @"c:\etc\googleplaystore1.csv";
             var googleApps = LoadGoogleAps(csvPath);
@@ -31,13 +27,12 @@ namespace FirstProject
             GroupDataOperations(googleApps);
         }
 
-
-        static void GroupDataOperations(IEnumerable<GoogleApp> googleApps)
+        private static void GroupDataOperations(IEnumerable<GoogleApp> googleApps)
         {
             var categoryGroup = googleApps
                 .GroupBy(a => a.Category)
-                .Where(g=>g.Min(a=>a.Reviews)>=10);
-            
+                .Where(g => g.Min(a => a.Reviews) >= 10);
+
             foreach (var item in categoryGroup)
             {
                 var averageReviews = item.Average(a => a.Reviews);
@@ -53,13 +48,14 @@ namespace FirstProject
                 {
                     foreach (var app in countApps)
                     {
-                        Console.Write(app.Name+"; ");
+                        Console.Write(app.Name + "; ");
                     }
                 }
-                Console.WriteLine("\n");   
+                Console.WriteLine("\n");
             }
         }
-        static void GroupData(IEnumerable<GoogleApp> googleApps)
+
+        private static void GroupData(IEnumerable<GoogleApp> googleApps)
         {
             var categoryGroup = googleApps
                 .GroupBy(a => new
@@ -67,7 +63,6 @@ namespace FirstProject
                     a.Category,
                     a.Type
                 });
-
 
             foreach (var group in categoryGroup)
             {
@@ -79,9 +74,9 @@ namespace FirstProject
             //var artAndDesignGroup = categoryGroup.First(a => a.Key == Category.ART_AND_DESIGN);
 
             //var apps = artAndDesignGroup.Select(a => a);
-            
         }
-        static void DataVerification(IEnumerable<GoogleApp> googleApps)
+
+        private static void DataVerification(IEnumerable<GoogleApp> googleApps)
         {
             var allOperatorResult = googleApps.Where(app => app.Category == Category.WEATHER)
                 .All(app => app.Reviews > 10);
@@ -94,7 +89,7 @@ namespace FirstProject
             Console.WriteLine($"Any : {anyOperatorResult}");
         }
 
-        static void DataSetOperation(IEnumerable<GoogleApp> googleApps)
+        private static void DataSetOperation(IEnumerable<GoogleApp> googleApps)
         {
             var paidAppsCategories = googleApps.Where(app => app.Type == Type.Paid)
                 .Select(app => app.Category).Distinct();
@@ -110,7 +105,7 @@ namespace FirstProject
 
             var appsUnion = setA.Union(setB);
             Console.WriteLine("App UNION");
-            Display(appsUnion.OrderBy(app=>app.Name));
+            Display(appsUnion.OrderBy(app => app.Name));
 
             Console.WriteLine("App INTERSECT: ");
             var appsIntersect = setA.Intersect(setB);
@@ -120,25 +115,26 @@ namespace FirstProject
             Console.WriteLine("App EXCEPT: ");
             Display(appsExcept);
         }
-        static void OrderData(IEnumerable<GoogleApp> googleApps)
+
+        private static void OrderData(IEnumerable<GoogleApp> googleApps)
         {
             var highRatedBeautyApps = googleApps.Where(app => app.Rating > 4.4 && app.Category == Category.BEAUTY);
             //Display(highRatedBeautyApps);
 
             var sortedResults = highRatedBeautyApps
                 .OrderByDescending(app => app.Rating)
-                .ThenByDescending(app=>app.Reviews)
+                .ThenByDescending(app => app.Reviews)
                 .Take(5);
             Display(sortedResults);
-
         }
-        static void DivideData(IEnumerable<GoogleApp> googleApps)
+
+        private static void DivideData(IEnumerable<GoogleApp> googleApps)
         {
             var highRatedBeautyApps = googleApps.Where(app => app.Rating > 4.4 && app.Category == Category.BEAUTY);
 
             //var first5highRatedBeautyApps = new List<GoogleApp>();
 
-            //foreach (var item in highRatedBeautyApps) 
+            //foreach (var item in highRatedBeautyApps)
             //{
             //    first5highRatedBeautyApps.Add(item);
             //    if (first5highRatedBeautyApps.Count() == 5)
@@ -155,7 +151,8 @@ namespace FirstProject
             var skippedResults = highRatedBeautyApps.SkipWhile(app => app.Reviews > 1000); ///warunek dziala do pierwszego wystapienia!!!
             Display(skippedResults);
         }
-        static void ProjectData(IEnumerable<GoogleApp> googleApps)
+
+        private static void ProjectData(IEnumerable<GoogleApp> googleApps)
         {
             var highRatedBeautyApps = googleApps.Where(app => app.Rating > 4.6 && app.Category == Category.BEAUTY);
             var highRatedBeautyAppsNames = highRatedBeautyApps.Select(app => app.Name);
@@ -177,7 +174,7 @@ namespace FirstProject
 
             Console.WriteLine(string.Join(":", genres));
 
-            var anonymouseDtos = highRatedBeautyApps.Select(app => new 
+            var anonymouseDtos = highRatedBeautyApps.Select(app => new
             {
                 Reviews = app.Reviews,
                 Name = app.Name,
@@ -196,10 +193,9 @@ namespace FirstProject
             //    highRatedBeautyAppsNames.Add(item);
             //}
         }
-        static void GetData(IEnumerable<GoogleApp> googleApps)
-        {
-            
 
+        private static void GetData(IEnumerable<GoogleApp> googleApps)
+        {
             var highRatedApps = googleApps.Where(app => app.Rating > 4.6 && app.Category == Category.BEAUTY);
             var highRatedBeautyApps = highRatedApps.Where(app => app.Category == Category.BEAUTY);
             //Display(highRatedApps);
@@ -209,20 +205,21 @@ namespace FirstProject
             var firstHighRatedBeautyApp = highRatedBeautyApps.LastOrDefault(app => app.Reviews < 50);
             Display(firstHighRatedBeautyApp);
         }
-        static void Display(IEnumerable<GoogleApp> googleApps)
+
+        private static void Display(IEnumerable<GoogleApp> googleApps)
         {
             foreach (var googleApp in googleApps)
             {
                 Console.WriteLine(googleApp);
             }
-
         }
-        static void Display(GoogleApp googleApp)
+
+        private static void Display(GoogleApp googleApp)
         {
             Console.WriteLine(googleApp);
         }
 
-        static List<GoogleApp> LoadGoogleAps(string csvPath)
+        private static List<GoogleApp> LoadGoogleAps(string csvPath)
         {
             using (var reader = new StreamReader(csvPath))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
@@ -231,11 +228,6 @@ namespace FirstProject
                 var records = csv.GetRecords<GoogleApp>().ToList();
                 return records;
             }
-
         }
-
     }
-
-
 }
-

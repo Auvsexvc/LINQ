@@ -1,8 +1,4 @@
-﻿using System;
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
-
-namespace FirstProject
+﻿namespace LINQ
 {
     public enum Category
     {

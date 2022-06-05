@@ -1,4 +1,4 @@
-﻿namespace FirstProject
+﻿namespace LINQ
 {
     public enum Type
     {
